@@ -61,6 +61,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Senparc.NeuChar;
 using Senparc.Weixin.Entities;
 using Senparc.Weixin.Exceptions;
 using Senparc.Weixin.HttpUtility;
@@ -76,17 +77,18 @@ namespace Senparc.Weixin.MP.CommonAPIs
         /// </summary>
         /// <param name="rootButtonList"></param>
         /// <param name="buttonGroup"></param>
+        [ApiBind(NeuChar.PlatformType.WeChat_OfficialAccount, "CommonApi.GetButtonGroup", true)]
         private static void GetButtonGroup(List<MenuFull_RootButton> rootButtonList, ButtonGroupBase buttonGroup)
         {
             foreach (var rootButton in rootButtonList)
             {
-                if (string.IsNullOrEmpty(rootButton.name))
+                if (rootButton == null || string.IsNullOrEmpty(rootButton.name))
                 {
                     continue; //没有设置一级菜单
                 }
                 var availableSubButton = rootButton.sub_button == null
                     ? 0
-                    : rootButton.sub_button.Count(z => !string.IsNullOrEmpty(z.name)); //可用二级菜单按钮数量
+                    : rootButton.sub_button.Count(z => z != null && !string.IsNullOrEmpty(z.name)); //可用二级菜单按钮数量
                 if (availableSubButton == 0)
                 {
                     //底部单击按钮
@@ -226,7 +228,7 @@ namespace Senparc.Weixin.MP.CommonAPIs
 
                     foreach (var subSubButton in rootButton.sub_button)
                     {
-                        if (string.IsNullOrEmpty(subSubButton.name))
+                        if (subSubButton == null || string.IsNullOrEmpty(subSubButton.name))
                         {
                             continue; //没有设置菜单
                         }
@@ -361,6 +363,7 @@ namespace Senparc.Weixin.MP.CommonAPIs
         /// <param name="resultFull"></param>
         /// <param name="buttonGroupBase">ButtonGroupBase的衍生类型，可以为ButtonGroup或ConditionalButtonGroup。返回的GetMenuResult中的menu属性即为此示例。</param>
         /// <returns></returns>
+        [ApiBind(NeuChar.PlatformType.WeChat_OfficialAccount, "CommonApi.GetMenuFromJsonResult", true)]
         public static GetMenuResult GetMenuFromJsonResult(GetMenuResultFull resultFull, ButtonGroupBase buttonGroupBase)
         {
             GetMenuResult result = null;
@@ -383,7 +386,7 @@ namespace Senparc.Weixin.MP.CommonAPIs
                 };
 
                 //设置个性化菜单列表
-                if (resultFull.conditionalmenu!=null)
+                if (resultFull.conditionalmenu != null)
                 {
                     var conditionalMenuList = new List<ConditionalButtonGroup>();
                     foreach (var conditionalMenu in resultFull.conditionalmenu)
