@@ -1,5 +1,5 @@
 ﻿/*----------------------------------------------------------------
-    Copyright (C) 2018 Senparc
+    Copyright (C) 2019 Senparc
     
     文件名：TenPayV3Controller.cs
     文件功能描述：微信支付V3Controller
@@ -47,6 +47,7 @@ using Senparc.Weixin.MP.Sample.CommonService.Utilities;
 using Senparc.CO2NET.Extensions;
 using Senparc.CO2NET.Helpers;
 using Senparc.CO2NET.Utilities;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Senparc.Weixin.MP.CoreSample.Controllers
 {
@@ -242,25 +243,24 @@ namespace Senparc.Weixin.MP.CoreSample.Controllers
             var bw = new ZXing.BarcodeWriterPixelData();
 
             var pixelData = bw.Write(bitMatrix);
-            using (var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb))
-            {
-                using (var ms = new MemoryStream())
-                {
-                    var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-                    try
-                    {
-                        // we assume that the row stride of the bitmap is aligned to 4 byte multiplied by the width of the image   
-                        System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
-                    }
-                    finally
-                    {
-                        bitmap.UnlockBits(bitmapData);
-                    }
-                    bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
 
-                    return File(ms, "image/png");
-                }
+            var fileStream = new MemoryStream();
+
+            var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            try
+            {
+                // we assume that the row stride of the bitmap is aligned to 4 byte multiplied by the width of the image   
+                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
             }
+            finally
+            {
+                bitmap.UnlockBits(bitmapData);
+            }
+            bitmap.Save(_fileStream, System.Drawing.Imaging.ImageFormat.Png);
+            fileStream.Seek(0, SeekOrigin.Begin);
+
+            return File(fileStream, "image/png");
         }
 
         public ActionResult NativeNotifyUrl()
@@ -914,7 +914,7 @@ namespace Senparc.Weixin.MP.CoreSample.Controllers
             if (BrowserUtility.BrowserUtility.SideInWeixinBrowser(HttpContext))
             {
                 //正在微信端，直接跳转到微信支付页面
-                return RedirectToAction("JsApi", new { productId = productId, hc = hc, appId = "1234" });
+                return RedirectToAction("JsApi", new { productId = productId, hc = hc });
             }
             else
             {
@@ -922,6 +922,8 @@ namespace Senparc.Weixin.MP.CoreSample.Controllers
                 return View(product);
             }
         }
+
+        private Stream _fileStream = null;
 
         /// <summary>
         /// 显示二维码
@@ -945,29 +947,26 @@ namespace Senparc.Weixin.MP.CoreSample.Controllers
             var bw = new ZXing.BarcodeWriterPixelData();
 
             var pixelData = bw.Write(bitMatrix);
-            using (var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb))
+            var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            var fileStream = new MemoryStream();
+            var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            try
             {
-                using (var ms = new MemoryStream())
-                {
-                    var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-                    try
-                    {
-                        // we assume that the row stride of the bitmap is aligned to 4 byte multiplied by the width of the image   
-                        System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
-                    }
-                    finally
-                    {
-                        bitmap.UnlockBits(bitmapData);
-                    }
-                    
-                    ms.Flush();//.net core 必须要加
-                    ms.Position = 0;//.net core 必须要加
-                    
-                    bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-
-                    return File(ms, "image/png");
-                }
+                // we assume that the row stride of the bitmap is aligned to 4 byte multiplied by the width of the image   
+                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
             }
+            finally
+            {
+                bitmap.UnlockBits(bitmapData);
+            }
+
+            fileStream.Flush();//.net core 必须要加
+            fileStream.Position = 0;//.net core 必须要加
+
+            bitmap.Save(fileStream, System.Drawing.Imaging.ImageFormat.Png);
+
+            fileStream.Seek(0, SeekOrigin.Begin);
+            return File(fileStream, "image/png");
         }
 
 
@@ -1099,14 +1098,12 @@ namespace Senparc.Weixin.MP.CoreSample.Controllers
             }
         }
 
+
         #endregion
 
         #region 付款到银行卡
 
         //TODO：完善
-
-
-
 
         #endregion
     }
