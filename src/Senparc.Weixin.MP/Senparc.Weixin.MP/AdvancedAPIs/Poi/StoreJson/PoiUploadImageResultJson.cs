@@ -18,15 +18,28 @@ Detail: https://github.com/JeffreySu/WeiXinMPSDK/blob/master/license.md
 ----------------------------------------------------------------*/
 #endregion Apache License Version 2.0
 
-namespace Senparc.Weixin.MP.AppStore
-{
-    //public static class Api
-    //{
-    //    public static IResponseMessageBase Request(IMessageHandler messageHandler, DeveloperInfo developerInfo, string xml)
-    //    {
-    //        var responseMessage = MessageAgent.RequestWeiweihiResponseMessage(messageHandler, developerInfo.WeiweihiKey, messageHandler.RequestMessage as RequestMessageBase);
+/*----------------------------------------------------------------
+    Copyright (C) 2019 Senparc
+    
+    文件名：UploadImageResultJson.cs
+    文件功能描述：门店 上传图片返回结果
+    
+    
+    创建标识：Senparc - 20150513
+----------------------------------------------------------------*/
 
-    //        return responseMessage;
-    //    }
-    //}
+using Senparc.Weixin.Entities;
+
+namespace Senparc.Weixin.MP.AdvancedAPIs.Poi
+{
+    /// <summary>
+    /// 上传图片返回结果
+    /// </summary>
+    public class PoiUploadImageResultJson : WxJsonResult
+    {
+        /// <summary>
+        /// 上传成功后图片的链接
+        /// </summary>
+        public string url { get; set; }
+    }
 }
