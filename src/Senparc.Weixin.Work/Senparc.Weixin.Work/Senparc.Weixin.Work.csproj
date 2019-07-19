@@ -87,6 +87,7 @@
     <Compile Include="AdvancedAPIs\Invoice\InvoiceJson\InvoiceData.cs" />
     <Compile Include="AdvancedAPIs\Invoice\InvoiceJson\InvoiceResultJson.cs" />
     <Compile Include="AdvancedAPIs\Invoice\InvoiceJson\MakeOutInvoiceData.cs" />
+    <Compile Include="AdvancedAPIs\MailList\Member\GetUseridResult.cs" />
     <Compile Include="AdvancedAPIs\Mobile\MobileApi.cs" />
     <Compile Include="AdvancedAPIs\Mobile\MobileApiResult.cs" />
     <Compile Include="AdvancedAPIs\KF\KFApi.cs" />
@@ -117,6 +118,8 @@
     <Compile Include="AdvancedAPIs\ThirdPartyAuth\ThirdPartyAuthJson\SessionInfo.cs" />
     <Compile Include="AdvancedAPIs\ThirdPartyAuth\ThirdPartyAuthJson\ThirdPartyAuthResult.cs" />
     <Compile Include="AdvancedAPIs\ThirdPartyAuth\ThirdPartyAuthJson\ThirdPartyAuthPostData.cs" />
+    <Compile Include="AdvancedAPIs\Webhook\WebhookApi.cs" />
+    <Compile Include="AdvancedAPIs\Webhook\WebhookNews.cs" />
     <Compile Include="AdvancedAPIs\WorkApiEnlightener.cs" />
     <Compile Include="CommonAPIs\ApiHandlerWapper.cs" />
     <Compile Include="Containers\JsApiTicketContainer.cs" />
@@ -240,6 +243,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Senparc.CO2NET">
+      <Version>0.8.3</Version>
+    </PackageReference>
     <PackageReference Include="Senparc.NeuChar">
       <Version>0.7.4</Version>
     </PackageReference>
